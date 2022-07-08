@@ -3,8 +3,8 @@ import 'dart:ffi';
 import 'package:flutter/material.dart';
 
 import 'dart:math';
-import 'package:untitled/block_unit.dart';
-import 'package:untitled/coordinate.dart';
+import 'package:untitled/game/block_unit.dart';
+import 'package:untitled/game/coordinate.dart';
 
 class PlayScreen extends StatelessWidget {
   const PlayScreen({Key? key}) : super(key: key);

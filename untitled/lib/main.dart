@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 
 // kakao login
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'package:untitled/kakao_login.dart';
-import 'package:untitled/main_view_model.dart';
-import 'package:untitled/play.dart';
+import 'package:untitled/kakaologin/kakao_login.dart';
+import 'package:untitled/kakaologin/main_view_model.dart';
+import 'package:untitled/game/play.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:untitled/startpage.dart';
 
@@ -21,7 +21,6 @@ class MyApp extends StatelessWidget {
 
   //StreamController<Int> streamController;
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,15 +35,6 @@ class MyApp extends StatelessWidget {
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -128,7 +118,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               ),
                               ElevatedButton(
                                   onPressed: validateAndSave,
-                                  child: Text('Login'))
+                                  child: Text('로그인')
+                              ),
+                              ElevatedButton(
+                                  onPressed: validateAndSave,
+                                  child: Text('이메일로 회원가입')
+                              ),
                             ],
                           )
                       ),
@@ -161,6 +156,5 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       ),
     );
-      ;
   }
 }

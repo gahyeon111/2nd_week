@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled/main.dart';
-import 'package:untitled/play.dart';
-import 'package:untitled/main_view_model.dart';
+import 'package:untitled/game/play.dart';
+import 'package:untitled/kakaologin/main_view_model.dart';
 
 class StartPage extends StatelessWidget {
   const StartPage({Key? key}) : super(key: key);
