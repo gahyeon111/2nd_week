@@ -1,22 +1,47 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'dart:math';
-import 'package:untitled/game/block_unit.dart';
-import 'package:untitled/game/coordinate.dart';
+import 'package:untitled/block_unit.dart';
+import 'package:untitled/coordinate.dart';
+import 'package:untitled/colortheme.dart';
 
 class PlayScreen extends StatelessWidget {
   const PlayScreen({Key? key}) : super(key: key);
 
+  Future<bool?> _onBackPressed(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text("나가시겠습니까?"),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text("네"),
+              onPressed: () => Navigator.pop(context, true),
+            ),
+            ElevatedButton(
+              child: Text("아니요"),
+              onPressed: () => Navigator.pop(context, false),
+            ),
+          ],
+        )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.yellow,
-      ),
-      home: const Play(title: 'Play'),
+    return WillPopScope(
+        onWillPop: () async {
+          return await _onBackPressed(context) ?? false;
+        },
+        child: MaterialApp(
+              title: 'Demo',
+              // theme: ThemeData(
+              //   primarySwatch: Colors.yellow,
+              // ),
+              darkTheme: ThemeData.dark(),
+              home: const Play(title: 'Play'),
+            )
     );
   }
 }
@@ -35,9 +60,16 @@ const int ITEM_EMPTY = 0;
 const int ITEM_WHITE = 1;
 const int ITEM_BLACK = 2;
 const int ITEM_HOLE = -1;
+const int HINT = 3;
+
+// theme index
+dynamic i = selected;
+const colorTheme = colorThemeClass.colorTheme;
+// gem theme
+// const gemTheme_1 = Container(width: 30, height: 30,decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white));
 
 class _Play extends State<Play> {
-  // late: 선언 후 할함
+  // late: 선언 후 할당
   late List<List<BlockUnit>> table;
   int currentTurn = ITEM_BLACK;
   int countItemWhite = 0;
@@ -45,8 +77,10 @@ class _Play extends State<Play> {
 
   @override
   void initState() {
+    i = selected;
     initTable();
     initTableItems();
+    makeHint(ITEM_BLACK);
     super.initState();
   }
 
@@ -71,11 +105,6 @@ class _Play extends State<Play> {
       }
       table.add(list);
     }
-    // var ran = set.toList();
-    // for (int i=0; i<5; i++) {
-    //   int n = (ran[i] / 8) as int;
-    //   table[n][ran[i] % 8] = BlockUnit(value: ITEM_HOLE);
-    // }
   }
 
   void initTableItems() {
@@ -92,24 +121,36 @@ class _Play extends State<Play> {
 
   Widget build(BuildContext content) {
     return Scaffold(
-      body: Container(
-          color: Color(0xffecf0f1),
-          child: Column(children: <Widget>[
-            buildMenu(),
-            Expanded(child: Center(
-              child: Container(
-                  decoration: BoxDecoration(
-                      color: Color(0xff34495e),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(width: 8, color: Color(0xff2c3e50))),
-                  child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: buildTable()
-                  )),
-            )),
-            buildScoreTab()
-          ])),
+          // appBar: AppBar(
+          //   title: Text(widget.title),
+          //   actions: [
+          //     IconButton(
+          //         icon: Icon(Icons.light_mode),
+          //         onPressed: () {
+          //           if (i < 2) i++;
+          //           else i = 0;
+          //           setState(() {});
+          //         })
+          //   ],
+          // ),
+          body: Container(
+              color: Color(0xffecf0f1),
+              child: Column(children: <Widget>[
+                buildMenu(),
+                Expanded(child: Center(
+                  child: Container(
+                      decoration: BoxDecoration(
+                          color: Color(colorTheme[i][0]),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(width: 8, color: Color(colorTheme[i][1]))),
+                      child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: buildTable()
+                      )),
+                )),
+                buildScoreTab()
+              ])),
     );
   }
 
@@ -138,24 +179,11 @@ class _Play extends State<Play> {
 
   Container buildMenu() {
     return Container(
-      padding: EdgeInsets.only(top: 36, bottom: 12, left: 16, right: 16),
-      color: Color(0xff34495e),
+      padding: EdgeInsets.only(top: 50, bottom: 12, left: 16, right: 16),
+      color: Color(0xffecf0f1),
       child:
       Row(mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            GestureDetector(onTap: () {
-              restart();
-            },
-                child: Container(constraints: BoxConstraints(minWidth: 120),
-                    decoration: BoxDecoration(color: Color(0xff27ae60),
-                        borderRadius: BorderRadius.circular(4)),
-                    padding: EdgeInsets.all(12),
-                    child: Column(children: <Widget>[
-                      Text("New Game", style: TextStyle(fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white))
-                    ]))),
-            Expanded(child: Container()),
             Container(constraints: BoxConstraints(minWidth: 120),
                 decoration: BoxDecoration(color: Color(0xffbbada0),
                     borderRadius: BorderRadius.circular(4)),
@@ -166,7 +194,20 @@ class _Play extends State<Play> {
                       color: Colors.white)),
                   Container(margin: EdgeInsets.only(left: 8), child:
                   buildItem(BlockUnit(value: currentTurn)))
-                ]))
+                ])),
+            Expanded(child: Container()),
+            GestureDetector(onTap: () {
+              restart();
+            },
+                child: Container(constraints: BoxConstraints(minWidth: 120),
+                    decoration: BoxDecoration(color: Color(0xffecf0f1),
+                        borderRadius: BorderRadius.circular(4)),
+                    padding: EdgeInsets.all(12),
+                    child: Column(children: <Widget>[
+                      Text("Restart", style: TextStyle(fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black))
+                    ]))),
           ]),
     );
   }
@@ -192,7 +233,7 @@ class _Play extends State<Play> {
           });
         }, child: Container(
             decoration: BoxDecoration(
-                color: Color(0xff27ae60),
+                color: Color(colorTheme[i][2]),
                 borderRadius: BorderRadius.circular(2),
               ),
             width: BLOCK_SIZE,
@@ -204,7 +245,7 @@ class _Play extends State<Play> {
   }
 
   bool pasteItemToTable(int row, int col, int item) {
-    if (table[row][col].value == ITEM_EMPTY) {
+    if ((table[row][col].value == ITEM_EMPTY)||(table[row][col].value == HINT)) {
       List<Coordinate> listCoordinate = [];
       listCoordinate.addAll(checkRight(row, col, item));
       listCoordinate.addAll(checkDown(row, col, item));
@@ -219,7 +260,9 @@ class _Play extends State<Play> {
         table[row][col].value = item;
         inverseItemFromList(listCoordinate);
         currentTurn = inverseItem(currentTurn);
+        int n = makeHint(currentTurn);
         updateCountItem();
+        checkGameOver(n);
         return true;
       }
     }
@@ -232,7 +275,7 @@ class _Play extends State<Play> {
       for (int c = col + 1; c < 8; c++) {
         if (table[row][c].value == item) {
           return list;
-        } else if (table[row][c].value == ITEM_EMPTY) {
+        } else if ((table[row][c].value == ITEM_EMPTY)||(table[row][c].value == HINT)) {
           return [];
         } else if (table[row][c].value == ITEM_HOLE) {
           return [];
@@ -250,7 +293,7 @@ class _Play extends State<Play> {
       for (int c = col - 1; c >= 0; c--) {
         if (table[row][c].value == item) {
           return list;
-        } else if (table[row][c].value == ITEM_EMPTY) {
+        } else if ((table[row][c].value == ITEM_EMPTY)||(table[row][c].value == HINT)) {
           return [];
         } else if (table[row][c].value == ITEM_HOLE) {
           return [];
@@ -268,7 +311,7 @@ class _Play extends State<Play> {
       for (int r = row + 1; r < 8; r++) {
         if (table[r][col].value == item) {
           return list;
-        } else if (table[r][col].value == ITEM_EMPTY) {
+        } else if ((table[r][col].value == ITEM_EMPTY)||(table[r][col].value == HINT)) {
           return [];
         } else if (table[r][col].value == ITEM_HOLE) {
           return [];
@@ -286,7 +329,7 @@ class _Play extends State<Play> {
       for (int r = row - 1; r >= 0; r--) {
         if (table[r][col].value == item) {
           return list;
-        } else if (table[r][col].value == ITEM_EMPTY) {
+        } else if ((table[r][col].value == ITEM_EMPTY)||(table[r][col].value == HINT)) {
           return [];
         } else if (table[r][col].value == ITEM_HOLE) {
           return [];
@@ -306,7 +349,7 @@ class _Play extends State<Play> {
       while (r >= 0 && c >= 0) {
         if (table[r][c].value == item) {
           return list;
-        } else if (table[r][c].value == ITEM_EMPTY) {
+        } else if ((table[r][c].value == ITEM_EMPTY)||(table[r][c].value == HINT)) {
           return [];
         } else if (table[r][c].value == ITEM_HOLE) {
           return [];
@@ -328,7 +371,7 @@ class _Play extends State<Play> {
       while (r >= 0 && c < 8) {
         if (table[r][c].value == item) {
           return list;
-        } else if (table[r][c].value == ITEM_EMPTY) {
+        } else if ((table[r][c].value == ITEM_EMPTY)||(table[r][c].value == HINT)) {
           return [];
         } else if (table[r][c].value == ITEM_HOLE) {
           return [];
@@ -350,7 +393,7 @@ class _Play extends State<Play> {
       while (r < 8 && c >= 0) {
         if (table[r][c].value == item) {
           return list;
-        } else if (table[r][c].value == ITEM_EMPTY) {
+        } else if ((table[r][c].value == ITEM_EMPTY)||(table[r][c].value == HINT)) {
           return [];
         } else if (table[r][c].value == ITEM_HOLE) {
           return [];
@@ -372,7 +415,7 @@ class _Play extends State<Play> {
       while (r < 8 && c < 8) {
         if (table[r][c].value == item) {
           return list;
-        } else if (table[r][c].value == ITEM_EMPTY) {
+        } else if ((table[r][c].value == ITEM_EMPTY)||(table[r][c].value == HINT)) {
           return [];
         } else if (table[r][c].value == ITEM_HOLE) {
           return [];
@@ -390,6 +433,34 @@ class _Play extends State<Play> {
     for (Coordinate c in list) {
       table[c.row][c.col].value = inverseItem(table[c.row][c.col].value);
     }
+  }
+
+  int makeHint(int item) {
+    int n = 0;
+    for (int r=0; r<8; r++) {
+      for (int c=0; c<8; c++) {
+        if (table[r][c].value == HINT) {
+          table[r][c].value = ITEM_EMPTY;
+        }
+        if (table[r][c].value == ITEM_EMPTY) {
+          List<Coordinate> listCoordinate = [];
+          listCoordinate.addAll(checkRight(r, c, item));
+          listCoordinate.addAll(checkDown(r, c, item));
+          listCoordinate.addAll(checkLeft(r, c, item));
+          listCoordinate.addAll(checkUp(r, c, item));
+          listCoordinate.addAll(checkUpLeft(r, c, item));
+          listCoordinate.addAll(checkUpRight(r, c, item));
+          listCoordinate.addAll(checkDownLeft(r, c, item));
+          listCoordinate.addAll(checkDownRight(r, c, item));
+
+          if (listCoordinate.isNotEmpty) {
+            table[r][c].value = HINT;
+            n++;
+          }
+        }
+      }
+    }
+    return n;
   }
 
   int inverseItem(int item) {
@@ -424,21 +495,12 @@ class _Play extends State<Play> {
           decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white));
     } else if (block.value == ITEM_HOLE) {
       return Container(width: BLOCK_SIZE, height: BLOCK_SIZE,
-          decoration: BoxDecoration(color: Color(0xff34495e), borderRadius: BorderRadius.circular(2),),
-      );
+          decoration: BoxDecoration(color: Color(colorTheme[i][0]), borderRadius: BorderRadius.circular(2),),
+    );}
+    else if (block.value == HINT) {
+      return Container(width: 10, height: 10,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(colorTheme[i][3]),));
     }
-
-    // child: Container(
-    //   decoration: BoxDecoration(
-    //     color: Color(0xff27ae60),
-    //     borderRadius: BorderRadius.circular(2),
-    //   ),
-    //   width: BLOCK_SIZE,
-    //   height: BLOCK_SIZE,
-    //   margin: EdgeInsets.all(2),
-    //   child: Center(child: buildItem(table[row][col])),
-    // )
-
     return Container();
   }
 
@@ -449,6 +511,40 @@ class _Play extends State<Play> {
       currentTurn = ITEM_BLACK;
       initTable();
       initTableItems();
+      makeHint(ITEM_BLACK);
     });
+  }
+
+  void checkGameOver(int n) {
+    if((countItemWhite == 0) || (countItemBlack == 0)) {
+      GameOver();
+    } else if (n == 0) {
+      if (makeHint(inverseItem(currentTurn)) == 0) {
+        GameOver();
+      } else {
+        currentTurn = inverseItem(currentTurn);
+        setState(() {});
+        Fluttertoast.showToast(
+            msg: "turn passed",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            backgroundColor: Colors.blue,
+            textColor: Colors.black,
+            fontSize: 16.0
+        );
+      }
+    }
+    return;
+  }
+
+  Future<bool?> GameOver() {
+    return Fluttertoast.showToast(
+        msg: "Game Over",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      backgroundColor: Colors.red,
+      textColor: Colors.white,
+      fontSize: 16.0
+    );
   }
 }

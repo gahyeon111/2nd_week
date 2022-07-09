@@ -40,6 +40,9 @@ dependencies:
   encrypt: ^5.0.1
   # Toast
   fluttertoast: ^8.0.9
+  # connect
+  http: ^0.13.4
+  socket_io_client: 1.0.2
 
 
   # The following adds the Cupertino Icons font to your application.
