@@ -95,42 +95,47 @@ class _MyHomePageState extends State<MyHomePage> {
                   children: <Widget>[
                     // Image.network(
                     //     viewModel.user?.kakaoAccount?.profile?.profileImageUrl ?? ''),
-                    Text(
-                      '${viewModel.isLogined}',
-                      style: Theme.of(context).textTheme.headline4,
-                    ),
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      child: new Form(
-                          key: formkey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              TextFormField(
-                                decoration: new InputDecoration(labelText: 'ID'),
-                                validator: (value) => value!.isEmpty ? 'ID cannot be empty': null,
-                                onSaved: (value) => _id = value!,
-                              ),
-                              TextFormField(
-                                decoration: new InputDecoration(labelText: 'PW'),
-                                validator: (value) => value!.isEmpty ? 'PW cannot be empty': null,
-                                onSaved: (value) => _password = value!,
-                              ),
-                              ElevatedButton(
-                                  onPressed: validateAndSave,
-                                  child: Text('로그인')
-                              ),
-                              ElevatedButton(
-                                  onPressed: validateAndSave,
-                                  child: Text('이메일로 회원가입')
-                              ),
-                            ],
-                          )
-                      ),
-                    ),
+                    // Text(
+                    //   '${viewModel.isLogined}',
+                    //   style: Theme.of(context).textTheme.headline4,
+                    // ),
+                    // Container(
+                    //   padding: EdgeInsets.all(16),
+                    //   child: new Form(
+                    //       key: formkey,
+                    //       child: Column(
+                    //         crossAxisAlignment: CrossAxisAlignment.stretch,
+                    //         children: <Widget>[
+                    //           TextFormField(
+                    //             decoration: new InputDecoration(labelText: 'ID'),
+                    //             validator: (value) => value!.isEmpty ? 'ID cannot be empty': null,
+                    //             onSaved: (value) => _id = value!,
+                    //           ),
+                    //           TextFormField(
+                    //             decoration: new InputDecoration(labelText: 'PW'),
+                    //             validator: (value) => value!.isEmpty ? 'PW cannot be empty': null,
+                    //             onSaved: (value) => _password = value!,
+                    //           ),
+                    //           ElevatedButton(
+                    //               onPressed: validateAndSave,
+                    //               child: Text('로그인')
+                    //           ),
+                    //           ElevatedButton(
+                    //               onPressed: validateAndSave,
+                    //               child: Text('이메일로 회원가입')
+                    //           ),
+                    //         ],
+                    //       )
+                    //   ),
+                    // ),
                     ElevatedButton(
                       onPressed: () async {
-                        await viewModel.logout();
+                        if (viewModel.isLogined) {
+                          // Navigator.push(context, MaterialPageRoute(builder: (_) => PlayScreen()));
+                          // Navigator.pop(context);
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => StartPage()));
+                        }
+                        // await viewModel.logout();
                         await viewModel.login();
                         if (viewModel.isLogined) {
                           // Navigator.push(context, MaterialPageRoute(builder: (_) => PlayScreen()));
@@ -139,15 +144,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         }
                         setState(() {}); // reload
                       },
-                      child: const Text('Kakao Login'),
+                      child: const Text('카카오톡으로 시작하기'),
                     ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await viewModel.logout();
-                        setState(() {}); // reload
-                      },
-                      child: const Text('Kakao Logout'),
-                    ),
+                    // ElevatedButton(
+                    //   onPressed: () async {
+                    //     await viewModel.logout();
+                    //     setState(() {}); // reload
+                    //   },
+                    //   child: const Text('Kakao Logout'),
+                    // ),
                   ],
                 ),
               ),
