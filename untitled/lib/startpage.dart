@@ -6,7 +6,6 @@ import 'package:untitled/play.dart';
 import 'package:untitled/colortheme.dart';
 import 'package:untitled/main_view_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dart:io';
 
 class StartPage extends StatelessWidget {

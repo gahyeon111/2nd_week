@@ -139,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         await viewModel.login();
                         if (viewModel.isLogined) {
                           // Navigator.push(context, MaterialPageRoute(builder: (_) => PlayScreen()));
-                          // Navigator.pop(context);
+                          Navigator.pop(context);
                           Navigator.push(context, MaterialPageRoute(builder: (_) => StartPage()));
                         }
                         setState(() {}); // reload
