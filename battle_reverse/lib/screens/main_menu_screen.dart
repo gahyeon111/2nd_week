@@ -1,6 +1,7 @@
 
 import 'package:battle_reverse/views/waiting_lobby.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../resources/socket_methods.dart';
 import '../widgets/custom_textfield.dart';
 
@@ -15,19 +16,46 @@ class MainMenuScreen extends StatefulWidget {
 class _MainMenuScreenState extends State<MainMenuScreen> {
   final TextEditingController _nameController = TextEditingController();
   final SocketMethods _socketMethods = SocketMethods();
+  int _counter = 1000;
 
+
+  @override
+  void dispose() {
+    super.dispose();
+    _nameController.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
     _socketMethods.createRoomSuccessListener(context);
     _socketMethods.updatePlayersStateListener(context);
+    _loadCounter();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _nameController.dispose();
+
+
+  _loadCounter() async {
+    print('_loadCounter()');
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _counter = (prefs.getInt('counter') ?? 1000);
+    });
+  }
+
+  _saveCounter() async {
+    print('_saveCounter()');
+    final prefs = await SharedPreferences.getInstance();
+    setState((){
+      prefs.setInt('counter', _counter);
+    });
+  }
+
+  void _updateCounter() {
+    setState(() {
+      _counter++;
+      _saveCounter();
+    });
   }
 
   @override
@@ -37,19 +65,20 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text('1000'),
+                Text('$_counter'),
                 CustomTextField(
                   controller: _nameController,
                   hintText: 'Enter your nickname',
                 ),
                 ElevatedButton(
-                    onPressed: () =>
+                    onPressed: () {
+                      _updateCounter();
                       // onlineMatching(context); // LoadingScreen으로 화면전환
                       // Navigator.push(context, MaterialPageRoute(builder: (_) => WaitingLobby()));
                       _socketMethods.createRoom(
                         _nameController.text,
-                      ),
-
+                      );
+                    },
                     child: const Text('온라인')
                 ),
                 // ElevatedButton(

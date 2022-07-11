@@ -48,11 +48,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () async {
                         await viewModel.login();
                         setState(() {});
+
                         // Navigator.pushNamed(context, MainMenuScreen.routeName);
                         Navigator.push(context, MaterialPageRoute(builder: (_) => MainMenuScreen()));
                       },
                       child: const Text('카카오톡으로 시작하기'),
+
                     ),
+
                   ],
                 ),
               ),

@@ -19,11 +19,11 @@ void showGameDialog(BuildContext context, String text) {
           actions: [
             TextButton(
               onPressed: () {
-                GameMethods().clearBoard(context);
+                // GameMethods().clearBoard(context);
                 Navigator.pop(context);
               },
               child: const Text(
-                'Play Again',
+                '나가기',
               ),
             ),
           ],
