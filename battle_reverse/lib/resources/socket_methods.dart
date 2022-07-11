@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
+import '../utils/utils.dart';
+import 'game_methods.dart';
+
 class SocketMethods {
   final _socketClient = SocketClient.instance.socket!;
 
@@ -18,10 +21,10 @@ class SocketMethods {
     }
   }
 
-  void deleteRoom(String nickname) {
-    if (nickname.isNotEmpty) {
+  void deleteRoom(String roomId) {
+    if (roomId.isNotEmpty) {
       _socketClient.emit('deleteRoom', {
-        'nickname': nickname,
+        'roomId': roomId,
       });
     }
   }
@@ -29,7 +32,8 @@ class SocketMethods {
   void createRoomSuccessListener(BuildContext context) {
     _socketClient.on('createRoomSuccess', (room) {
       Provider.of<RoomDataProvider>(context, listen: false).updateRoomData(room);
-      Navigator.pushNamed(context, GameScreen.routeName);
+      Navigator.push(context, MaterialPageRoute(builder: (_) => GameScreen()));
+      // Navigator.pushNamed(context, GameScreen.routeName);
     });
   }
 
@@ -44,8 +48,8 @@ class SocketMethods {
     });
   }
 
-  void tapGrid(int index, String roomId, List<int> displayElements) {
-    if (displayElements[index] == 0) {
+  void tapGrid(int index, String roomId, RoomDataProvider roomDataProvider, BuildContext context) {
+    if (GameMethods().pasteItemToTable((index/8).toInt(), index%8, roomDataProvider.roomData['turn']['playerType'], context)) {
       _socketClient.emit('tap', {
         'index': index,
         'roomId': roomId,
@@ -63,14 +67,11 @@ class SocketMethods {
   void tappedListener(BuildContext context) {
     _socketClient.on('tapped', (data) {
       RoomDataProvider roomDataProvider =
-      Provider.of<RoomDataProvider>(context, listen: false);
-      roomDataProvider.updateDisplayElements(
-        data['index'],
-        data['choice'],
-      );
+        Provider.of<RoomDataProvider>(context, listen: false);
+      GameMethods().pasteItemToTable((data['index']/8).toInt(), data['index']%8, data['choice'], context);
       roomDataProvider.updateRoomData(data['room']);
       // check winnner
-      // GameMethods().checkWinner(context, _socketClient);
+      GameMethods().checkWinner(context, _socketClient);
     });
   }
 
@@ -88,8 +89,9 @@ class SocketMethods {
 
   void endGameListener(BuildContext context) {
     _socketClient.on('endGame', (playerData) {
-      // showGameDialog(context, '${playerData['nickname']} won the game!');
+      showGameDialog(context, '${playerData['nickname']} won the game!');
       Navigator.pop(context);
+      // Navigator.popUntil(context, (route) => false);
     });
   }
 

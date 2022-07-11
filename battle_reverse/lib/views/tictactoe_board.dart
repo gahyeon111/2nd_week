@@ -1,7 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:battle_reverse/provider/room_data_provider.dart';
 import 'package:battle_reverse/resources/socket_methods.dart';
 import 'package:provider/provider.dart';
+import 'package:battle_reverse/utils/block_unit.dart';
+import 'package:battle_reverse/screens/colorTheme.dart';
 
 class TicTacToeBoard extends StatefulWidget {
   const TicTacToeBoard({Key? key}) : super(key: key);
@@ -9,6 +13,9 @@ class TicTacToeBoard extends StatefulWidget {
   @override
   State<TicTacToeBoard> createState() => _TicTacToeBoardState();
 }
+
+dynamic i = selected;
+const colorTheme = colorThemeClass.colorTheme;
 
 class _TicTacToeBoardState extends State<TicTacToeBoard> {
   final SocketMethods _socketMethods = SocketMethods();
@@ -19,11 +26,12 @@ class _TicTacToeBoardState extends State<TicTacToeBoard> {
     _socketMethods.tappedListener(context);
   }
 
-  void tapped(int index, RoomDataProvider roomDataProvider) {
+  void tapped(int index, RoomDataProvider roomDataProvider, BuildContext context) {
     _socketMethods.tapGrid(
-      index,
-      roomDataProvider.roomData['_id'],
-      roomDataProvider.displayElements,
+        index,
+        roomDataProvider.roomData['_id'],
+        roomDataProvider,
+        context
     );
   }
 
@@ -31,6 +39,36 @@ class _TicTacToeBoardState extends State<TicTacToeBoard> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     RoomDataProvider roomDataProvider = Provider.of<RoomDataProvider>(context);
+
+    // initTable
+    var set = <int>{};
+    while (set.length != 5) {
+      int temp = Random().nextInt(64);
+      if ((temp != 27) && (temp != 28) && (temp != 35) && (temp != 36))
+        set.add(temp);
+    }
+    // set init
+    for (int row = 0; row < 8; row++) {
+      List<BlockUnit> list = [];
+      for (int col = 0; col < 8; col++) {
+        if (set.contains(row * 8 + col)) {
+          list.add(BlockUnit(value: ITEM_HOLE));
+        } else {
+          list.add(BlockUnit(value: ITEM_EMPTY));
+        }
+      }
+      roomDataProvider.displayElements.add(list);
+    }
+    roomDataProvider.displayElements[3][3].value = ITEM_WHITE;
+    roomDataProvider.displayElements[4][3].value = ITEM_BLACK;
+    roomDataProvider.displayElements[3][4].value = ITEM_BLACK;
+    roomDataProvider.displayElements[4][4].value = ITEM_WHITE;
+    // hint
+    roomDataProvider.displayElements[2][3].value = HINT;
+    roomDataProvider.displayElements[3][2].value = HINT;
+    roomDataProvider.displayElements[4][5].value = HINT;
+    roomDataProvider.displayElements[5][4].value = HINT;
+
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -47,7 +85,7 @@ class _TicTacToeBoardState extends State<TicTacToeBoard> {
           ),
           itemBuilder: (BuildContext context, int index) {
             return GestureDetector(
-              onTap: () => tapped(index, roomDataProvider),
+              onTap: () => tapped(index, roomDataProvider, context),
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
@@ -56,23 +94,25 @@ class _TicTacToeBoardState extends State<TicTacToeBoard> {
                 ),
                 child: Center(
                   child: AnimatedSize(
-                    duration: const Duration(milliseconds: 200),
-                    child: Text(
-                      roomDataProvider.displayElements[index].toString(),
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 100,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 40,
-                              color:
-                                  roomDataProvider.displayElements[index] == 'O'
-                                      ? Colors.red
-                                      : Colors.blue,
-                            ),
-                          ]),
-                    ),
+                      duration: const Duration(milliseconds: 200),
+                      child:
+                      buildItem(roomDataProvider.displayElements[(index/8).toInt()][index%8])
+                    // Text(
+                    //   '0',
+                    //   style: TextStyle(
+                    //       color: Colors.white,
+                    //       fontWeight: FontWeight.bold,
+                    //       fontSize: 100,
+                    //       shadows: [
+                    //         Shadow(
+                    //           blurRadius: 40,
+                    //           color:
+                    //               roomDataProvider.displayElements[(index/8).toInt()][index%8].value == 0
+                    //                   ? Colors.red
+                    //                   : Colors.blue,
+                    //         ),
+                    //       ]),
+                    // ),
                   ),
                 ),
               ),
@@ -81,5 +121,23 @@ class _TicTacToeBoardState extends State<TicTacToeBoard> {
         ),
       ),
     );
+  }
+
+  Widget buildItem(BlockUnit block) {
+    if (block.value == ITEM_BLACK) {
+      return Container(width: 30, height: 30,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.blue));
+    } else if (block.value == ITEM_WHITE) {
+      return Container(width: 30, height: 30,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white));
+    } else if (block.value == ITEM_HOLE) {
+      return Container(width: 40, height: 40,
+        decoration: BoxDecoration(color: Color(colorTheme[i][0]), borderRadius: BorderRadius.circular(2),),
+      );}
+    else if (block.value == HINT) {
+      return Container(width: 10, height: 10,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: Color(colorTheme[i][3]),));
+    }
+    return Container();
   }
 }

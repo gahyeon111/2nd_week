@@ -1,6 +1,5 @@
 import 'package:battle_reverse/provider/room_data_provider.dart';
 import 'package:battle_reverse/screens/game_screen.dart';
-import 'package:battle_reverse/screens/loading_screen.dart';
 import 'package:battle_reverse/screens/login_screen.dart';
 import 'package:battle_reverse/screens/main_menu_screen.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +23,6 @@ class MyApp extends StatelessWidget {
         routes: {
           LoginScreen.routeName: (context) => const LoginScreen(),
           MainMenuScreen.routeName: (context) => const MainMenuScreen(),
-          LoadingScreen.routeName: (context) => const LoadingScreen(),
           GameScreen.routeName: (context) => const GameScreen(),
         },
         initialRoute: LoginScreen.routeName,

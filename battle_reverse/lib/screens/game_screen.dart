@@ -1,8 +1,8 @@
 import 'package:battle_reverse/provider/room_data_provider.dart';
 import 'package:battle_reverse/resources/socket_methods.dart';
-import 'package:battle_reverse/screens/loading_screen.dart';
 import 'package:battle_reverse/views/scoreboard.dart';
 import 'package:battle_reverse/views/tictactoe_board.dart';
+import 'package:battle_reverse/views/waiting_lobby.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,19 +30,20 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     RoomDataProvider roomDataProvider = Provider.of<RoomDataProvider>(context);
+
     return Scaffold(
-      body: roomDataProvider.roomData['isJoin'] ? const LoadingScreen() : Center(
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              const Scoreboard(),
-              const TicTacToeBoard(),
-              Text(
-                  '${roomDataProvider.roomData['turn']['nickname']}\'s turn'),
-            ],
-          ),
-        ),
+      body: roomDataProvider.roomData['isJoin']
+          ? const WaitingLobby()
+          : SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Scoreboard(),
+                  const TicTacToeBoard(),
+                  Text(
+                      '${roomDataProvider.roomData['turn']['nickname']}\'s turn'),
+              ],
+            ),
       ),
     );
   }
