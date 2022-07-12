@@ -53,8 +53,9 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
     _loadCounter();
     _loadLogin();
     _socketMethods.createRoomSuccessListener(context);
+    _socketMethods.createHoleSuccessListener(context);
     _socketMethods.updatePlayersStateListener(context);
-    _socketMethods.endGameListener(context);
+    // _socketMethods.endGameListener(context);
   }
 
 
@@ -107,7 +108,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                         nickname = _nameController.text;
                         GameMethods().clearBoard(context);
 
-                        _socketMethods.createRoom(_nameController.text,);
+                        _socketMethods.createRoom(_nameController.text, context);
 
                       },
                       text: '게임시작'),

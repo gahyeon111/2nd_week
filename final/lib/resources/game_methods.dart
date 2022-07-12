@@ -59,23 +59,23 @@ class GameMethods {
 
       if (roomDataProvider.player1.playerType == winner) {
 
-        showGameDialog(context, '${roomDataProvider.player1.nickname} won!');
+        showGameDialog(context, '${roomDataProvider.player1.nickname} 승리!');
         socketClent.emit('winner', {
           'winnerSocketId': roomDataProvider.player1.socketID,
           'roomId': roomDataProvider.roomData['_id'],
         });
       } else {
 
-        showGameDialog(context, '${roomDataProvider.player2.nickname} won!');
+        showGameDialog(context, '${roomDataProvider.player2.nickname} 승리!');
         socketClent.emit('winner', {
           'winnerSocketId': roomDataProvider.player2.socketID,
           'roomId': roomDataProvider.roomData['_id'],
         });
       }
       score = roomDataProvider.player1.nickname == name
-          ? ((roomDataProvider.countItemWhite - roomDataProvider.countItemBlack)/2).toInt()
-          : (roomDataProvider.countItemBlack - roomDataProvider.countItemWhite);
-      _incrementCounter((score).toInt());
+          ? (roomDataProvider.countItemWhite - roomDataProvider.countItemBlack)*2
+          : (roomDataProvider.countItemBlack - roomDataProvider.countItemWhite)*3;
+      _incrementCounter(score);
     }
   }
 
@@ -104,6 +104,45 @@ class GameMethods {
 
     roomDataProvider.setCountItemTo0();
 
+  }
+
+  List<int> createRandomHole(BuildContext context) {
+    RoomDataProvider roomDataProvider =
+      Provider.of<RoomDataProvider>(context, listen: false);
+
+    List<int> hole = [];
+    var set = <int>{};
+    while (set.length != 5) {
+      int temp = Random().nextInt(64);
+      if ((temp != 27) && (temp != 28) && (temp != 35) && (temp != 36))
+        set.add(temp);
+    }
+    for (int row = 0; row < 8; row++) {
+      for (int col = 0; col < 8; col++) {
+        if (set.contains(row * 8 + col)) {
+          hole.add(row * 8 + col);
+          // player1의 판에 random hole set
+          // roomDataProvider.displayElements[row][col] = BlockUnit(value: ITEM_HOLE);
+        }
+      }
+    }
+    // print('create call');
+    return hole;
+  }
+
+  void settingHole(BuildContext context, List hole) {
+    RoomDataProvider roomDataProvider =
+      Provider.of<RoomDataProvider>(context, listen: false);
+
+    for (int row = 0; row < 8; row++) {
+      for (int col = 0; col < 8; col++) {
+        if (hole.contains(row * 8 + col)) {
+          // random hole set
+          roomDataProvider.displayElements[row][col] = BlockUnit(value: ITEM_HOLE);
+        }
+      }
+    }
+    // print('setting call');
   }
 
   // List<List<BlockUnit>> initTable() {

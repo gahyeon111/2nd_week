@@ -6,10 +6,13 @@ import 'package:mp_tictactoe/screens/game_screen.dart';
 import 'package:mp_tictactoe/screens/main_menu_screen.dart';
 import 'package:mp_tictactoe/utils/colors.dart';
 import 'package:provider/provider.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+void main() async {
   KakaoSdk.init(nativeAppKey: 'b0c7751657481bf90627c859c9680ca0');
   runApp(const MyApp());
+  // SharedPreferences prefs = await SharedPreferences.getInstance();
+  // prefs.clear();
 }
 
 class MyApp extends StatelessWidget {

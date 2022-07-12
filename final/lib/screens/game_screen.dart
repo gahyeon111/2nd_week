@@ -68,7 +68,7 @@ class _GameScreenState extends State<GameScreen> {
                     const Scoreboard(),
                     const TicTacToeBoard(),
                     Text(
-                        '${roomDataProvider.roomData['turn']['nickname']}\'s turn'),
+                        '${roomDataProvider.roomData['turn']['nickname']}의 차례입니다.'),
 
                   ],
                 ),

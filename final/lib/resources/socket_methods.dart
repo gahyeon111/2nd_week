@@ -13,10 +13,12 @@ class SocketMethods {
   Socket get socketClient => _socketClient;
 
   // EMITS
-  void createRoom(String nickname) {
+  void createRoom(String nickname, BuildContext context) {
     if (nickname.isNotEmpty) {
+      List<int> hole = GameMethods().createRandomHole(context);
       _socketClient.emit('createRoom', {
         'nickname': nickname,
+        'hole': hole
       });
     }
   }
@@ -52,6 +54,14 @@ class SocketMethods {
     _socketClient.on('createRoomSuccess', (room) {
       Provider.of<RoomDataProvider>(context, listen: false)
           .updateRoomData(room);
+      Navigator.pushNamed(context, GameScreen.routeName);
+    });
+  }
+  void createHoleSuccessListener(BuildContext context) {
+    _socketClient.on('createHoleSuccess', (hole) {
+      // Provider.of<RoomDataProvider>(context, listen: false)
+      //     .updateRoomData(hole);
+      GameMethods().settingHole(context, hole);
       Navigator.pushNamed(context, GameScreen.routeName);
     });
   }
@@ -112,18 +122,18 @@ class SocketMethods {
   //   });
   // }
 
-  void endGameListener(BuildContext context) {
-    _socketClient.on('endGame', (playerData) {
-
-      // score = roomDataProvider.player1.nickname == name
-      //     ? (roomDataProvider.countItemWhite - roomDataProvider.countItemBlack)
-      //     : (roomDataProvider.countItemBlack - roomDataProvider.countItemWhite);
-      // _incrementCounter((score/2).toInt());
-
-
-      showGameDialog(context, '${playerData['nickname']} won the game!');
-      // Provider.of<RoomDataProvider>(context, listen: false).
-
-    });
-  }
+  // void endGameListener(BuildContext context) {
+  //   _socketClient.on('endGame', (playerData) {
+  //
+  //     // score = roomDataProvider.player1.nickname == name
+  //     //     ? (roomDataProvider.countItemWhite - roomDataProvider.countItemBlack)
+  //     //     : (roomDataProvider.countItemBlack - roomDataProvider.countItemWhite);
+  //     // _incrementCounter((score/2).toInt());
+  //
+  //
+  //     showGameDialog(context, '${playerData['nickname']} won the game!');
+  //     // Provider.of<RoomDataProvider>(context, listen: false).
+  //
+  //   });
+  // }
 }

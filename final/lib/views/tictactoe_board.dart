@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mp_tictactoe/provider/room_data_provider.dart';
 import 'package:mp_tictactoe/resources/socket_methods.dart';
+import 'package:mp_tictactoe/utils/colors.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/colorTheme.dart';
@@ -106,7 +107,7 @@ class _TicTacToeBoardState extends State<TicTacToeBoard> {
           decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.white));
     } else if (block.value == ITEM_HOLE) {
       return Container(width: 40, height: 40,
-        decoration: BoxDecoration(color: Color(colorTheme[i][0]), borderRadius: BorderRadius.circular(2),),
+        decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2),),
       );}
     else if (block.value == HINT) {
       return Container(width: 10, height: 10,
