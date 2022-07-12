@@ -16,7 +16,7 @@ const DB = "mongodb+srv://root:mxtec7@cluster0.tltwp13.mongodb.net/?retryWrites=
 
 io.on("connection", (socket) => {
   console.log("connected!");
-  socket.on("createRoom", async ({ nickname }) => {
+  socket.on("createRoom", async ({ nickname, hole }) => {
     console.log(nickname);
     
     var avail = await Room.findOne({isJoin: true}); 
@@ -31,6 +31,7 @@ io.on("connection", (socket) => {
       avail.isJoin = false;
       avail = await avail.save();
       io.to(avail._id).emit("createRoomSuccess", avail);
+      io.to(avail._id).emit("createHoleSuccess", hole);
       io.to(avail._id).emit("updatePlayers", avail.players);
       io.to(avail._id).emit("updateRoom", avail);
       
@@ -52,6 +53,7 @@ io.on("connection", (socket) => {
       // io -> send data to everyone
       // socket -> sending data to yourself
       io.to(roomId).emit("createRoomSuccess", room);
+      // io.to(roomId).emit("createHoleSuccess", hole);
     }
     
     
@@ -86,7 +88,11 @@ io.on("connection", (socket) => {
       }
       room = await room.save();
       console.log(room);
-      c
+      io.to(roomId).emit("tapped", {
+        index,
+        choice,
+        room,
+      });
     } catch (e) {
       console.log(e);
     }
