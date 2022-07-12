@@ -26,3 +26,7 @@
 * 본인 돌의 갯수가 상단에 표시되며, 현재 누구의 턴인지 하단에 표시된다.
 * 더이상 돌을 놓을 수 없는 상태가 되면 게임이 종료된다.
 * 게임 종료 시에 돌 갯수 차이에 비례해, 승리 시 점수를 얻고, 패배 시 점수를 잃는다.
+
+### 참고자료
+* https://github.com/benznest/othello-game-flutter
+* https://github.com/RivaanRanawat/flutter-multiplayer-tictactoe
